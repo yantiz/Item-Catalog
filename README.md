@@ -18,6 +18,6 @@
 installed **Vagrant** and **VirtualBox** (or other equivalent tools) before running the virtual machine.
 4. Inside the environment of the virtual machine, navigate to the path `/vagrant/catalog` and install other dependencies for this project using the commands
 `pip install Flask-SQLAlchemy` and `pip install Flask-WTF` (Note: You might need to append `sudo` before the commands for some permission concerns.)
-5. Configure the database and then add some predefined categories into the database using the commands `python database_setup.py` and `python add_categories.py`. You are welcomed to define more categories for this project by adding more code into `add_categories.py`.
+5. Configure the database and subsequently add some predefined categories into the database using the commands `python database_setup.py` and `python add_categories.py`. You are welcomed to define more categories for this project by adding more code into `add_categories.py`.
 6. Finally, you are able to run this project by typing `python project.py`. When you want to finish, type `CTRL-C` to quit the project and type `exit` and `vagrant halt` to
 terminate the virtual machine.
