@@ -2,7 +2,7 @@
 - This project builds a basic website that allows users to log in via their Google accounts as well as add, edit, and delete their own items under each category.
 - In addition to their own items, users are allowed to check out fellow users' items by click the relevant links.
 - The names of each category and item are unique and used as primary keys in the database.
-- The JSON endpoint for this site is implemented and could be accessed through the URL `http://localhost:8000/catalog/json`.
+- The correct versions of dependencies are included in `requirements.txt`.
 
 
 ## Technologies that are used
@@ -10,6 +10,7 @@
 - Web Framework: Flask
 - Form Submission: WTForms
 - Backend: SQLAlchemy
+- Authentication and Authorization: AJAX and Google OAuth 2.0
 
 ## To play around with this project locally
 1. Download the [virtual machine](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/58488015_fsnd-virtual-machine/fsnd-virtual-machine.zip) using **Vagrant** and **VirtualBox** (or other equivalent tools).

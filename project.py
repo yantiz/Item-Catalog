@@ -1,4 +1,6 @@
-import hashlib, os
+import hashlib
+import os
+from functools import wraps
 from random import choice
 from string import ascii_uppercase, digits
 
@@ -23,15 +25,37 @@ app = Flask(__name__)
 APPLICATION_NAME = "Item Catalog"
 CLIENT_ID = loads(open('client_secret.json', 'r').read())['web']['client_id']
 
+
+def login_required(f):
+    """
+    Description: 
+        A decorator that only allows logged in users to access the function
+    Args: 
+        f (Type: function): The function to be wrapped
+    Returns:
+        The decorated function
+    """
+    @wraps(f)
+    def decorated_function(*args, **kw):
+        if 'user_id' not in login_session:
+            return redirect(url_for('show_login'))
+        return f(*args, **kw)
+    return decorated_function
+
+
 @app.route('/')
 @app.route('/catalog/')
 def homepage():
     categories = Category.query.order_by(Category.name)
     user_id = login_session.get('user_id')
     name = login_session.get('name')
-    return render_template('latest_items.html', user_id=user_id,
-                                                name=name,
-                                                categories=categories)
+    return render_template(
+                          'latest_items.html',
+                          user_id=user_id,
+                          name=name,
+                          categories=categories
+                          )
+
 
 # Create an anti-forgery state token
 # Store it in the session for later validation.
@@ -40,6 +64,7 @@ def show_login():
     state = hashlib.sha256(os.urandom(1024)).hexdigest()
     login_session['state'] = state
     return render_template('login.html', state=state)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -84,21 +109,21 @@ def gconnect():
         return error, 401
 
     stored_credentials = login_session.get('access_token')
-    stored_userid= login_session.get('user_id')
+    stored_userid = login_session.get('user_id')
     if stored_credentials is not None and user_id == stored_userid:
         output = "<h1>You have already logged in.</h1>"
-        return output 
+        return output
 
     url_userinfo = "https://www.googleapis.com/oauth2/v1/userinfo"
     payload = {'access_token': access_token, 'alt': 'json'}
     result = requests.get(url_userinfo, params=payload)
     result = result.json()
-        
+
     # Store the user information including access token for later use
     login_session['access_token'] = access_token
-    login_session['user_id'] = user_id 
+    login_session['user_id'] = user_id
     login_session['name'] = result['name']
-    login_session['picture'] = result['picture'] 
+    login_session['picture'] = result['picture']
 
     # Add the user to the database if not being present before
     user_id, name = login_session['user_id'], login_session['name']
@@ -120,6 +145,7 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['name'])
     return output
 
+
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
@@ -139,24 +165,28 @@ def gdisconnect():
 
     message = "You have successfully logged out."
     return render_template('prompt.html', prompt=message)
-   
+
+
 @app.route('/catalog/<string:category_name>/items/')
 def items_of_category(category_name):
     categories = Category.query.order_by(Category.name)
     category = Category.query.filter_by(name=category_name).one()
-    return render_template('items_of_category.html', categories=categories,
-                                                     category=category)
+    return render_template(
+                          'items_of_category.html',
+                          categories=categories,
+                          category=category
+                          )
+
 
 @app.route('/catalog/<string:category_name>/<string:item_name>/')
 def show_item(category_name, item_name):
-    item = Item.query.filter_by(name=item_name).one()    
+    item = Item.query.filter_by(name=item_name).one()
     return render_template('show_item.html', item=item)
 
-@app.route('/catalog/add/', methods=['GET', 'POST'])
-def add_item():
-    if 'user_id' not in login_session:
-        return redirect(url_for('show_login'))
 
+@app.route('/catalog/add/', methods=['GET', 'POST'])
+@login_required
+def add_item():
     form = MyForm()
     if form.validate_on_submit():
         name = form.name.data
@@ -165,19 +195,23 @@ def add_item():
         try:
             item = Item.query.filter_by(name=name).one()
             flash("The item already exists.")
-            return render_template('add_or_edit_item.html', add=True, form=form)
+            return render_template(
+                                  'add_or_edit_item.html',
+                                  add=True,
+                                  form=form
+                                  )
         except NoResultFound:
             category = Category.query.\
                                filter_by(name=category_name).\
                                one()
             user = User.query.filter_by(id=login_session['user_id']).one()
-            new_item = Item(name=name, description=description, 
+            new_item = Item(name=name, description=description,
                             category=category, user=user)
             db.session.add(new_item)
             db.session.commit()
             flash("The new item was successfully added.")
             return redirect(url_for('homepage'))
-    
+
     if request.method == "POST":
         if not (form.name.data and form.description.data):
             flash("You have to fill name and description about the item.")
@@ -185,19 +219,21 @@ def add_item():
             flash("Name is only allowed to have letters and spaces.")
 
     return render_template('add_or_edit_item.html', add=True, form=form)
-    
-@app.route('/catalog/<string:item_name>/edit/', methods=['GET', 'POST'])
-def edit_item(item_name):
-    if 'user_id' not in login_session:
-        return redirect(url_for('show_login'))
 
+
+@app.route('/catalog/<string:item_name>/edit/', methods=['GET', 'POST'])
+@login_required
+def edit_item(item_name):
     form = MyForm()
     item = Item.query.filter_by(name=item_name).one()
     user_id = login_session['user_id']
     if item.user_id != user_id:
         error = "You don't have the permission to do so."
-        url = url_for('show_item', category_name=item.category.name,
-                                   item_name=item.name)
+        url = url_for(
+                     'show_item',
+                     category_name=item.category.name,
+                     item_name=item.name
+                     )
         return render_template('prompt.html', prompt=error, url=url), 401
 
     if form.validate_on_submit():
@@ -208,7 +244,7 @@ def edit_item(item_name):
         db.session.commit()
         flash("The item was successfully edited.")
         return redirect(url_for('homepage'))
-    
+
     if request.method == 'GET':
         form.name.data = item.name
         form.description.data = item.description
@@ -221,17 +257,19 @@ def edit_item(item_name):
 
     return render_template('add_or_edit_item.html', item=item, form=form)
 
+
 @app.route('/catalog/<string:item_name>/delete/', methods=['GET', 'POST'])
+@login_required
 def delete_item(item_name):
-    if 'user_id' not in login_session:
-        return redirect(url_for('show_login'))
-    
     item = Item.query.filter_by(name=item_name).one()
     user_id = login_session['user_id']
     if item.user_id != user_id:
         error = "You don't have the permission to do so."
-        url = url_for('show_item', category_name=item.category.name,
-                                   item_name=item.name)
+        url = url_for(
+                     'show_item',
+                     category_name=item.category.name,
+                     item_name=item.name
+                     )
         return render_template('prompt.html', prompt=error, url=url), 401
 
     if request.method == 'POST':
@@ -242,10 +280,11 @@ def delete_item(item_name):
     else:
         return render_template('delete.html', item=item)
 
-@app.route('/catalog/json/')
-def json_endpoint():
-    categories = Category.query.order_by(Category.name).all()
-    return jsonify(categories=[category.serialize for category in categories])
+
+@app.route('/catalog/<string:item_name>/json/')
+def json_endpoint(item_name):
+    item = Item.query.filter_by(name=item_name).one()
+    return jsonify(Item=item.serialize)
 
 if __name__ == '__main__':
     app.config['DEBUG'] = True
