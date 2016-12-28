@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block login %}
+<div class='row'>
+  <!-- Add where you want your sign-in button to render -->
+  <!-- Use an image that follows the branding guidelines in a real app -->
+  <button id="signinButton"><img src='{{ url_for('static', filename='btn_google_signin_dark_normal_web@2x.png') }}' alt='Sign in with Google'></button>
+  <script>
+    $('#signinButton').click(function() {
+      // signInCallback defined in step 6.
+      auth2.grantOfflineAccess({'redirect_uri': 'postmessage'}).then(signInCallback);
+    });
+  </script>
+
+  <div id="login"></div>
+
+  <!-- Last part of BODY element in file index.html -->
+  <script>
+    function signInCallback(authResult) {
+      if (authResult['code']) {
+
+        // Hide the sign-in button now that the user is authorized, for example:
+        $('#signinButton').attr('style', 'display: none');
+
+        // Send the code to the server
+        $.ajax({
+          type: 'POST',
+          url: '/gconnect?state={{state}}',
+          contentType: 'application/octet-stream; charset=utf-8',
+          success: function(result) {
+            // Handle or verify the server response.
+            if (result) {
+              $('#login').html(result + '</br>Redirecting...')
+              setTimeout(function() {
+                window.location.href = "{{ url_for('homepage') }}";
+              }, 3000);
+            }
+          },
+          error: function(xhr, status, error) {
+            var error = xhr.responseText;
+            $('#login').html(error + '</br>Redirecting...')
+            setTimeout(function() {
+              window.location.href = "{{ url_for('homepage') }}";
+            }, 3000);
+          },
+          processData: false,
+          data: authResult['code']
+        });
+      } 
+      else if (authResult['error']) {
+        console.log('There was an error: ' + authResult['error']);
+      }
+      else {
+        $('#login').html('Failed to make a server-side call. Check your configuration and console.');	
+      }
+    }
+  </script>
+</div>
+{% endblock %}

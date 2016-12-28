@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block homepage %}
+<div class="row">
+  <div class="category">
+    <h2>Categories</h2>
+    {% for category in categories %}
+      <a href='{{ url_for('items_of_category', category_name=category.name) }}'>{{ category.name }}</a>
+      <br>
+    {% endfor %}
+  </div>
+  {% block latest_items %}
+  {% endblock %}
+
+  {% block items_of_category %}
+  {% endblock %}
+</div>
+{% endblock %}

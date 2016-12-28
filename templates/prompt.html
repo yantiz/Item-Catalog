@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block prompt %}
+<h1>{{ prompt }}</h1>
+<br>
+Redirecting...
+<script>
+  setTimeout(function() {
+    {% if url %}
+      window.location.href = "{{ url }}";
+    {% else %}
+      window.location.href = "{{ url_for('homepage') }}";
+    {% endif %}
+  }, 3000);
+</script>
+{% endblock %}

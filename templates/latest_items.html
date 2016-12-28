@@ -1,0 +1,31 @@
+{% extends 'homepage.html' %}
+
+{% block latest_items %}
+<div class="item">
+  <h2>Lastest Items For Each Category</h2> 
+  {% for category in categories %}
+    {% if category.items %}
+      <a href='{{ url_for('show_item', category_name=category.name, item_name=category.items[0].name) }}'>{{ category.items[0].name }}</a>
+    {% else %}
+      None
+    {% endif %}
+    <br>
+  {% endfor %}
+  <hr>
+  {% if user_id %}
+    <a href='{{ url_for('add_item') }}'>Add Item</a>
+    |
+    <a href='{{ url_for('gdisconnect') }}'>Logout</a> ({{ name }})
+  {% else %}
+    <a href='{{ url_for('show_login') }}'>Login</a>
+  {% endif %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <br>
+        <span class='flash'>{{ message }}</span>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+{% endblock %}

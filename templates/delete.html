@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block delete %}
+<div class="row">
+  <div class="item">
+    <h2>Delete Item</h2>
+    <p>Are you sure you want to delete the item <strong class="flash">{{item.name}}</strong>?</p>
+    <form method='post'>
+      <button type='button'><a href='{{ url_for('show_item', category_name=item.category.name, item_name=item.name) }}'>Cancel</button>
+      <button type='submit'>Yes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block add_or_edit_item %}
+<div class="row">
+  <div class="item">
+    {% if add %}
+      {% set header = 'Add Item' %}
+    {% else %}
+      {% set header = 'Edit Item' %}
+    {% endif %}
+    <h2>{{ header }}</h2>
+    <form method='post'>
+      {{ form.csrf_token }}
+      {{ form.name.label }}:<br>{{ form.name() }}<br><br>
+      {{ form.description.label }}:<br>{{ form.description() }}<br><br>
+      {{ form.category.label }}:<br>{{ form.category }}<br><br>
+      {% if add %}
+        <button type="button"><a href='{{ url_for('homepage') }}'>Cancel</a></button>
+      {% else %}
+        <button type="button"><a href='{{ url_for('show_item', category_name=item.category.name, item_name=item.name) }}'>Cancel</a></button>
+      {% endif %}
+      {{ form.submit }}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <br>
+            <span class='flash'>{{ message }}</span>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </form>
+  </div>
+</div>
+{% endblock %}
