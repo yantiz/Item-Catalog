@@ -2,6 +2,8 @@
 This project builds a basic website that allows users to log in via their Google accounts as well as add, edit, and delete their own items under each category.
 In addition to their own items, users are allowed to check out fellow users' items by click the relevant links.
 The names of each category and item are unique and used as primary keys in the database.
+The JSON endpoint for this site is implemented and could be accessed through the url `http://localhost:8000/catalog/json`.
+
 
 ## Technologies that are used
 - Front End: Jinja2
