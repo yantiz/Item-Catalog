@@ -1,6 +1,6 @@
 # Item Catalog
 - This project builds a basic website that allows users to log in via their Google accounts as well as add, edit, and delete their own items under each category.
-- In addition to their own items, users are allowed to check out fellow users' items by click the relevant links.
+- In addition to their own items, users are allowed to check out fellow users' items by click relevant links.
 - The names of each category and item are unique and used as primary keys in the database.
 - The correct versions of dependencies are included in `requirements.txt`.
 
