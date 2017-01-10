@@ -5,7 +5,7 @@ from random import choice
 from string import ascii_uppercase, digits
 
 from sqlalchemy.orm.exc import NoResultFound
-from database_setup import db, User, Category, Item
+from database_setup import app, db, User, Category, Item
 
 from form import MyForm
 
@@ -19,8 +19,6 @@ import requests
 from flask import Flask, request, redirect, url_for, flash, render_template, \
                   make_response, session as login_session
 from flask.json import jsonify, loads
-
-app = Flask(__name__)
 
 APPLICATION_NAME = "Item Catalog"
 CLIENT_ID = loads(open('client_secret.json', 'r').read())['web']['client_id']
