@@ -25,7 +25,7 @@ class Item(db.Model):
 
     name = db.Column(db.String(80), primary_key=True)
     description = db.Column(db.Text, nullable=False)
-    category_name = db.Column(db.Integer, db.ForeignKey('category.name'))
+    category_name = db.Column(db.String, db.ForeignKey('category.name'))
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
     created = db.Column(db.DateTime, nullable=False,
                         server_default=db.func.now())
