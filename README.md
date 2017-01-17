@@ -12,6 +12,10 @@
 - Backend: SQLAlchemy
 - Authentication and Authorization: AJAX and Google OAuth 2.0
 
+## Instruction on how to connect to my app's webpage through browsers
+This project is currently hosted by a Apache HTTP Server supported by Amazon Web Service (AWS).
+[Click me](http://ec2-35-167-117-224.us-west-2.compute.amazonaws.com/) to see the hosted app.
+
 ## To play around with this project locally
 1. Download the [virtual machine](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/58488015_fsnd-virtual-machine/fsnd-virtual-machine.zip) using **Vagrant** and **VirtualBox** (or other equivalent tools).
 2. Download the source files of the project and put them into the folder named `catalog` of the downloaded virtual machine.
